@@ -12,9 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
   m_Name: Data
   m_EditorClassIdentifier: 
-  m_GroupName: Darta
+  m_GroupName: Data
   m_GUID: 7a8fd5d5b47464b47bdb257d5c7973ae
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: 0b591287f8c7a1140a6e57522cb21622
+    m_Address: TestData
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - PreLoad
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: bf1b95c2b0ca6cd4c88ed51fb6d9b2a3, type: 2}
   m_SchemaSet:

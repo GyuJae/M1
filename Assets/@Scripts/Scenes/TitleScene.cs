@@ -1,22 +1,19 @@
 using UnityEngine;
+using static Define;
 
-public class TitleScene : MonoBehaviour
+public class TitleScene : BaseScene
 {
-    void Start()
+    public override bool Init()
     {
-        Managers.Resource.LoadAllAsync<Object>("PreLoad", (key, count, totalCount) =>
-        {
-            Debug.Log($"{key} {count} / {totalCount}");
-
-            if (count >= totalCount)
-            {
-                // TODO
-            }
-        });
+        if (base.Init() == false) return false;
+        SceneType = EScene.TitleScene;
+        
+        
+        return true;
     }
 
-    void Update()
+    public override void Clear()
     {
-        
+       
     }
 }

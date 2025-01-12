@@ -27,10 +27,9 @@ public class ResourceManager
 			Debug.LogError($"Failed to load prefab : {key}");
 			return null;
 		}
-
-		// TODO
-		// if (pooling)
-		// 	return Managers.Pool.Pop(prefab);
+		
+		if (pooling)
+			return Managers.Pool.Pop(prefab);
 
 		GameObject go = Object.Instantiate(prefab, parent);
 		go.name = prefab.name;
@@ -43,9 +42,8 @@ public class ResourceManager
 		if (go == null)
 			return;
 
-		// TODO
-		// if (Managers.Pool.Push(go))
-		// 	return;
+		if (Managers.Pool.Push(go))
+			return;
 
 		Object.Destroy(go);
 	}

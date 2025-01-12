@@ -1,14 +1,24 @@
+using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 
-public class DataManager : MonoBehaviour
+public interface ILoader<Key, Value>
 {
-    void Start()
+    Dictionary<Key, Value> MakeDict();
+}
+
+public class DataManager 
+{
+    public Dictionary<int, Data.TestData> TestDic { get; private set; } = new();
+
+    public void Init()
     {
-        
+        TestDic = LoadJson<Data.TestDataLoader, int, Data.TestData>("TestData").MakeDict();
     }
 
-    void Update()
+    private Loader LoadJson<Loader, Key, Value>(string path) where Loader : ILoader<Key, Value>
     {
-        
+        TextAsset textAsset = Managers.Resource.Load<TextAsset>(path);
+        return JsonConvert.DeserializeObject<Loader>(textAsset.text);
     }
 }

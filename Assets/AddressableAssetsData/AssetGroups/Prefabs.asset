@@ -16,7 +16,13 @@ MonoBehaviour:
   m_GUID: cf4b282cef91d7c4f9fe264b36dc0c04
   m_SerializeEntries:
   - m_GUID: 1f13423cb3b174b4da5307fc2467c6b8
-    m_Address: hero
+    m_Address: Hero
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - PreLoad
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5a40e413d750cdb44b0fe888fbf55284
+    m_Address: BaseMap
     m_ReadOnly: 0
     m_SerializedLabels:
     - PreLoad

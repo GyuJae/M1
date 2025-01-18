@@ -12,6 +12,10 @@ public class GameScene : BaseScene
         map.transform.position = Vector3.zero;
         map.name = "@BaseMap";
 
+        var hero = Managers.Object.Spawn<Hero>(Vector3.zero);
+
+        Managers.UI.ShowBaseUI<UI_Joystick>();
+
         return true;
     }
 

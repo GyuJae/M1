@@ -17,6 +17,13 @@ public static class Define
         Npc
     }
 
+    public enum EJoystickState
+    {
+        PointerDown,
+        PointerUp,
+        Drag
+    }
+
     public enum EObjectType
     {
         None,

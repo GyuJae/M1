@@ -14,12 +14,19 @@ public class Monster : Creature
         if (base.Init() == false) return false;
 
         CreatureType = ECreatureType.Monster;
-        CreatureState = ECreatureState.Idle;
         Speed = 3.0f;
 
         StartCoroutine(CoUpdateAI());
 
         return true;
+    }
+
+    public override void SetInfo(int templeId)
+    {
+        base.SetInfo(templeId);
+
+        // State
+        CreatureState = ECreatureState.Idle;
     }
 
     #region AI

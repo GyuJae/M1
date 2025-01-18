@@ -56,6 +56,20 @@ public class BaseObject : InitBase
         };
     }
 
+    #region Battle
+
+    public virtual void OnDamaged(BaseObject attacker)
+    {
+
+    }
+
+    public virtual void OnDead(BaseObject attacker)
+    {
+
+    }
+
+    #endregion
+
     #region Spine
 
     protected virtual void SetSpineAnimation(string dataLabel, int sortingOrder)

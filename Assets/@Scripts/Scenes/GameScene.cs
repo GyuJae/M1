@@ -25,6 +25,11 @@ public class GameScene : BaseScene
             Managers.Object.Spawn<Monster>(new Vector3Int(0, 1, 0), MONSTER_BEAR_ID);
         }
 
+        {
+            var env = Managers.Object.Spawn<Env>(new Vector3(0, 2, 0), ENV_TREE1_ID);
+            env.EnvState = EEnvState.Idle;
+        }
+
         return true;
     }
 

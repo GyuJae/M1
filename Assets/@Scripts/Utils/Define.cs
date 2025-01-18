@@ -17,6 +17,13 @@ public static class Define
         Npc
     }
 
+    public enum EEnvState
+    {
+        Idle,
+        OnDamaged,
+        Dead
+    }
+
     public enum EJoystickState
     {
         PointerDown,

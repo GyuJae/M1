@@ -7,6 +7,7 @@ public class ObjectManager
 {
     public HashSet<Hero> Heroes { get; } = new();
     public HashSet<Monster> Monsters { get; } = new();
+    public HashSet<Env> Envs { get; } = new();
 
 
     public T Spawn<T>(Vector3 position, int templateID) where T : BaseObject
@@ -24,7 +25,7 @@ public class ObjectManager
             case EObjectType.Creature:
             {
                 // Data Check
-                if (templateID != 0 && Managers.Data.CreatureDic.TryGetValue(templateID, out var data) == false)
+                if (templateID != 0 && Managers.Data.CreatureDic.TryGetValue(templateID, out var creatureData) == false)
                 {
                     Debug.LogError($"ObjectManager Spawn Creature Failed! TryGetValue TemplateID : {templateID}");
                     return null;
@@ -53,8 +54,21 @@ public class ObjectManager
                 break;
             }
             case EObjectType.Projectile:
+                break;
             case EObjectType.Env:
-                // TODO
+                // Data Check
+                if (templateID != 0 && Managers.Data.EnvDic.TryGetValue(templateID, out var envData) == false)
+                {
+                    Debug.LogError($"ObjectManager Spawn Env Failed! TryGetValue TemplateID : {templateID}");
+                    return null;
+                }
+
+                obj.transform.parent = EnvRoot;
+
+                var env = go.GetComponent<Env>();
+                Envs.Add(env);
+
+                env.SetInfo(templateID);
                 break;
             case EObjectType.None:
                 break;
@@ -89,7 +103,8 @@ public class ObjectManager
             }
             case EObjectType.Projectile:
             case EObjectType.Env:
-                // TODO
+                var env = obj as Env;
+                Envs.Remove(env);
                 break;
         }
         Managers.Resource.Destroy(obj.gameObject);
@@ -113,6 +128,10 @@ public class ObjectManager
     public Transform MonsterRoot
     {
         get { return GetRootTransform("@Monsters"); }
+    }
+    public Transform EnvRoot
+    {
+        get { return GetRootTransform("@Envs"); }
     }
 
     #endregion

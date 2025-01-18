@@ -1,158 +1,109 @@
-﻿using System.Collections.Generic;
-using UnityEditor;
-using System.IO;
-using UnityEngine;
-using System.Linq;
-
-using Data;
-using System;
-using System.Reflection;
+﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using Data;
 using Newtonsoft.Json;
+using UnityEditor;
+using UnityEngine;
 
 public class DataTransformer : EditorWindow
 {
 #if UNITY_EDITOR
-	[MenuItem("Tools/ParseExcel %#K")]
-	public static void ParseExcelDataToJson()
-	{
-		ParseExcelDataToJson<TestDataLoader, TestData>("Test");
-		//LEGACY_ParseTestData("Test");
+    [MenuItem("Tools/ParseExcel %#K")]
+    public static void ParseExcelDataToJson()
+    {
+        ParseExcelDataToJson<CreatureDataLoader, CreatureData>("Creature");
+        ParseExcelDataToJson<EnvDataLoader, EnvData>("Env");
 
-		Debug.Log("DataTransformer Completed");
-	}
+        Debug.Log("DataTransformer Completed");
+    }
 
-	#region LEGACY
-	// LEGACY !
-	public static T ConvertValue<T>(string value)
-	{
-		if (string.IsNullOrEmpty(value))
-			return default(T);
+    #region Helpers
 
-		TypeConverter converter = TypeDescriptor.GetConverter(typeof(T));
-		return (T)converter.ConvertFromString(value);
-	}
+    static void ParseExcelDataToJson<Loader, LoaderData>(string filename) where Loader : new() where LoaderData : new()
+    {
+        var loader = new Loader();
+        var field = loader.GetType().GetFields()[0];
+        field.SetValue(loader, ParseExcelDataToList<LoaderData>(filename));
 
-	public static List<T> ConvertList<T>(string value)
-	{
-		if (string.IsNullOrEmpty(value))
-			return new List<T>();
+        var jsonStr = JsonConvert.SerializeObject(loader, Formatting.Indented);
+        File.WriteAllText($"{Application.dataPath}/@Resources/Data/JsonData/{filename}Data.json", jsonStr);
+        AssetDatabase.Refresh();
+    }
 
-		return value.Split('&').Select(x => ConvertValue<T>(x)).ToList();
-	}
+    static List<LoaderData> ParseExcelDataToList<LoaderData>(string filename) where LoaderData : new()
+    {
+        var loaderDatas = new List<LoaderData>();
 
-	static void LEGACY_ParseTestData(string filename)
-	{
-		TestDataLoader loader = new TestDataLoader();
+        var lines = File.ReadAllText($"{Application.dataPath}/@Resources/Data/ExcelData/{filename}Data.csv")
+            .Split("\n");
 
-		string[] lines = File.ReadAllText($"{Application.dataPath}/@Resources/Data/ExcelData/{filename}Data.csv").Split("\n");
+        for (var l = 1; l < lines.Length; l++)
+        {
+            var row = lines[l].Replace("\r", "").Split(',');
+            if (row.Length == 0)
+                continue;
+            if (string.IsNullOrEmpty(row[0]))
+                continue;
 
-		for (int y = 1; y < lines.Length; y++)
-		{
-			string[] row = lines[y].Replace("\r", "").Split(',');
-			if (row.Length == 0)
-				continue;
-			if (string.IsNullOrEmpty(row[0]))
-				continue;
+            var loaderData = new LoaderData();
 
-			int i = 0;
-			TestData testData = new TestData();
-			testData.Level = ConvertValue<int>(row[i++]);
-			testData.Exp = ConvertValue<int>(row[i++]);
-			testData.Skills = ConvertList<int>(row[i++]);
-			testData.Speed = ConvertValue<float>(row[i++]);
-			testData.Name = ConvertValue<string>(row[i++]);
+            var fields = typeof(LoaderData).GetFields();
+            for (var f = 0; f < fields.Length; f++)
+            {
+                var field = loaderData.GetType().GetField(fields[f].Name);
+                var type = field.FieldType;
 
-			loader.tests.Add(testData);
-		}
+                if (type.IsGenericType)
+                {
+                    var value = ConvertList(row[f], type);
+                    field.SetValue(loaderData, value);
+                }
+                else
+                {
+                    var value = ConvertValue(row[f], field.FieldType);
+                    field.SetValue(loaderData, value);
+                }
+            }
 
-		string jsonStr = JsonConvert.SerializeObject(loader, Formatting.Indented);
-		File.WriteAllText($"{Application.dataPath}/@Resources/Data/JsonData/{filename}Data.json", jsonStr);
-		AssetDatabase.Refresh();
-	}
-	#endregion
+            loaderDatas.Add(loaderData);
+        }
 
-	#region Helpers
-	private static void ParseExcelDataToJson<Loader, LoaderData>(string filename) where Loader : new() where LoaderData : new()
-	{
-		Loader loader = new Loader();
-		FieldInfo field = loader.GetType().GetFields()[0];
-		field.SetValue(loader, ParseExcelDataToList<LoaderData>(filename));
+        return loaderDatas;
+    }
 
-		string jsonStr = JsonConvert.SerializeObject(loader, Formatting.Indented);
-		File.WriteAllText($"{Application.dataPath}/@Resources/Data/JsonData/{filename}Data.json", jsonStr);
-		AssetDatabase.Refresh();
-	}
+    static object ConvertValue(string value, Type type)
+    {
+        if (string.IsNullOrEmpty(value))
+            return null;
 
-	private static List<LoaderData> ParseExcelDataToList<LoaderData>(string filename) where LoaderData : new()
-	{
-		List<LoaderData> loaderDatas = new List<LoaderData>();
+        var converter = TypeDescriptor.GetConverter(type);
+        return converter.ConvertFromString(value);
+    }
 
-		string[] lines = File.ReadAllText($"{Application.dataPath}/@Resources/Data/ExcelData/{filename}Data.csv").Split("\n");
+    static object ConvertList(string value, Type type)
+    {
+        if (string.IsNullOrEmpty(value))
+            return null;
 
-		for (int l = 1; l < lines.Length; l++)
-		{
-			string[] row = lines[l].Replace("\r", "").Split(',');
-			if (row.Length == 0)
-				continue;
-			if (string.IsNullOrEmpty(row[0]))
-				continue;
+        // Reflection
+        var valueType = type.GetGenericArguments()[0];
+        var genericListType = typeof(List<>).MakeGenericType(valueType);
+        var genericList = Activator.CreateInstance(genericListType) as IList;
 
-			LoaderData loaderData = new LoaderData();
+        // Parse Excel
+        var list = value.Split('&').Select(x => ConvertValue(x, valueType)).ToList();
 
-			System.Reflection.FieldInfo[] fields = typeof(LoaderData).GetFields();
-			for (int f = 0; f < fields.Length; f++)
-			{
-				FieldInfo field = loaderData.GetType().GetField(fields[f].Name);
-				Type type = field.FieldType;
+        foreach (var item in list)
+            genericList.Add(item);
 
-				if (type.IsGenericType)
-				{
-					object value = ConvertList(row[f], type);
-					field.SetValue(loaderData, value);
-				}
-				else
-				{
-					object value = ConvertValue(row[f], field.FieldType);
-					field.SetValue(loaderData, value);
-				}
-			}
+        return genericList;
+    }
 
-			loaderDatas.Add(loaderData);
-		}
-
-		return loaderDatas;
-	}
-
-	private static object ConvertValue(string value, Type type)
-	{
-		if (string.IsNullOrEmpty(value))
-			return null;
-
-		TypeConverter converter = TypeDescriptor.GetConverter(type);
-		return converter.ConvertFromString(value);
-	}
-
-	private static object ConvertList(string value, Type type)
-	{
-		if (string.IsNullOrEmpty(value))
-			return null;
-
-		// Reflection
-		Type valueType = type.GetGenericArguments()[0];
-		Type genericListType = typeof(List<>).MakeGenericType(valueType);
-		var genericList = Activator.CreateInstance(genericListType) as IList;
-
-		// Parse Excel
-		var list = value.Split('&').Select(x => ConvertValue(x, valueType)).ToList();
-
-		foreach (var item in list)
-			genericList.Add(item);
-
-		return genericList;
-	}
-	#endregion
+    #endregion
 
 #endif
 }

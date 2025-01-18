@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Data;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -7,18 +8,20 @@ public interface ILoader<Key, Value>
     Dictionary<Key, Value> MakeDict();
 }
 
-public class DataManager 
+public class DataManager
 {
-    public Dictionary<int, Data.TestData> TestDic { get; private set; } = new();
+    public Dictionary<int, CreatureData> CreatureDic { get; private set; } = new();
+    public Dictionary<int, EnvData> EnvDic { get; private set; } = new();
 
     public void Init()
     {
-        TestDic = LoadJson<Data.TestDataLoader, int, Data.TestData>("TestData").MakeDict();
+        CreatureDic = LoadJson<CreatureDataLoader, int, CreatureData>("CreatureData").MakeDict();
+        EnvDic = LoadJson<EnvDataLoader, int, EnvData>("EnvData").MakeDict();
     }
 
-    private Loader LoadJson<Loader, Key, Value>(string path) where Loader : ILoader<Key, Value>
+    Loader LoadJson<Loader, Key, Value>(string path) where Loader : ILoader<Key, Value>
     {
-        TextAsset textAsset = Managers.Resource.Load<TextAsset>(path);
+        var textAsset = Managers.Resource.Load<TextAsset>(path);
         return JsonConvert.DeserializeObject<Loader>(textAsset.text);
     }
 }

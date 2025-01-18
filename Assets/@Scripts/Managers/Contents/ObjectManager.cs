@@ -9,7 +9,7 @@ public class ObjectManager
     public HashSet<Monster> Monsters { get; } = new();
 
 
-    public T Spawn<T>(Vector3 position) where T : BaseObject
+    public T Spawn<T>(Vector3 position, int templateID) where T : BaseObject
     {
         var prefabName = typeof(T).Name;
 
@@ -23,6 +23,13 @@ public class ObjectManager
         {
             case EObjectType.Creature:
             {
+                // Data Check
+                if (templateID != 0 && Managers.Data.CreatureDic.TryGetValue(templateID, out var data) == false)
+                {
+                    Debug.LogError($"ObjectManager Spawn Creature Failed! TryGetValue TemplateID : {templateID}");
+                    return null;
+                }
+
                 var creature = go.GetComponent<Creature>();
                 switch (creature.CreatureType)
                 {
@@ -42,6 +49,7 @@ public class ObjectManager
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+                creature.SetInfo(templateID);
                 break;
             }
             case EObjectType.Projectile:

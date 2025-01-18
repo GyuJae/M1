@@ -39,6 +39,18 @@ public class BaseObject : InitBase
         return true;
     }
 
+    public void TranslateEx(Vector3 dir)
+    {
+        transform.Translate(dir);
+
+        LookLeft = dir.x switch
+        {
+            < 0 => true,
+            > 0 => false,
+            _ => LookLeft
+        };
+    }
+
     #region Spine
 
     protected virtual void UpdateAnimation()

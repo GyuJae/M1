@@ -8,7 +8,7 @@ public class Hero : Creature
 
     void Update()
     {
-        transform.Translate(moveDir * (Speed * Time.deltaTime));
+        transform.TranslateEx(moveDir * (Speed * Time.deltaTime));
     }
 
     public override bool Init()
@@ -30,7 +30,6 @@ public class Hero : Creature
     void HandleOnMoveDirChanged(Vector2 dir)
     {
         moveDir = dir;
-        Debug.Log(dir);
     }
 
     void HandleOnJoystickStateChanged(EJoystickState joystickState)

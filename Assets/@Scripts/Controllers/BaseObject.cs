@@ -17,7 +17,7 @@ public class BaseObject : InitBase
 
     public float ColliderRadius
     {
-        get { return Collider?.radius ?? 0.0f; }
+        get { return Collider != null ? Collider.radius : 0.0f; }
     }
     public Vector3 CenterPosition
     {
@@ -42,18 +42,6 @@ public class BaseObject : InitBase
         SkeletonAnim = GetComponent<SkeletonAnimation>();
         RigidBody = GetComponent<Rigidbody2D>();
         return true;
-    }
-
-    public void TranslateEx(Vector3 dir)
-    {
-        transform.Translate(dir);
-
-        LookLeft = dir.x switch
-        {
-            < 0 => true,
-            > 0 => false,
-            _ => LookLeft
-        };
     }
 
     #region Battle

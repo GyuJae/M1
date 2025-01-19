@@ -10,7 +10,6 @@ public class Creature : BaseObject
 {
     protected ECreatureState creatureState = ECreatureState.None;
     public CreatureData CreatureData { get; private set; }
-    public float Speed { get; protected set; } = 1.0f;
 
     public ECreatureType CreatureType { get; protected set; } = ECreatureType.None;
     public virtual ECreatureState CreatureState
@@ -101,6 +100,22 @@ public class Creature : BaseObject
 
         // State
         CreatureState = ECreatureState.Idle;
+    }
+
+    public void ChangeColliderSize(EColliderSize size = EColliderSize.Normal)
+    {
+        switch (size)
+        {
+            case EColliderSize.Small:
+                Collider.radius = CreatureData.ColliderRadius * 0.8f;
+                break;
+            case EColliderSize.Normal:
+                Collider.radius = CreatureData.ColliderRadius;
+                break;
+            case EColliderSize.Big:
+                Collider.radius = CreatureData.ColliderRadius * 1.2f;
+                break;
+        }
     }
 
     #region Stats

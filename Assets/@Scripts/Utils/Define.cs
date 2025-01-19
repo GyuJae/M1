@@ -1,5 +1,12 @@
 public static class Define
 {
+    public enum EColliderSize
+    {
+        Small,
+        Normal,
+        Big
+    }
+
     public enum ECreatureState
     {
         None,
@@ -22,6 +29,15 @@ public static class Define
         Idle,
         OnDamaged,
         Dead
+    }
+
+    public enum EHeroMoveState
+    {
+        None,
+        TargetMonster,
+        CollectEnv,
+        ReturnToCamp,
+        ForceMove
     }
 
     public enum EJoystickState

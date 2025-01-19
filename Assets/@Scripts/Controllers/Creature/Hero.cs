@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Spine;
 using UnityEngine;
 using static Define;
+using Event = Spine.Event;
 
 public class Hero : Creature
 {
@@ -137,6 +139,20 @@ public class Hero : Creature
                 CreatureState = ECreatureState.Move;
             }
         }
+    }
+
+    public override void OnAnimEventHandler(TrackEntry trackEntry, Event e)
+    {
+        base.OnAnimEventHandler(trackEntry, e);
+
+        // TODO
+        CreatureState = ECreatureState.Move;
+
+        // Skill
+        if (_target.IsValid() == false)
+            return;
+
+        _target.OnDamaged(this);
     }
 
     #region AI

@@ -60,8 +60,6 @@ public class Monster : Creature
                 var dir = hero.transform.position - transform.position;
                 var distToTargetSqr = dir.sqrMagnitude;
 
-                Debug.Log(distToTargetSqr);
-
                 if (distToTargetSqr > searchDistanceSqr)
                     continue;
 
@@ -135,6 +133,25 @@ public class Monster : Creature
     protected override void UpdateDead()
     {
 
+    }
+
+    #endregion
+
+    #region Battle
+
+    public override void OnDamaged(BaseObject attacker)
+    {
+        base.OnDamaged(attacker);
+        // TODO
+    }
+
+    public override void OnDead(BaseObject attacker)
+    {
+        base.OnDead(attacker);
+
+        // TODO : Drop Item
+
+        Managers.Object.Despawn(this);
     }
 
     #endregion

@@ -8,6 +8,7 @@ public class ObjectManager
     public HashSet<Hero> Heroes { get; } = new();
     public HashSet<Monster> Monsters { get; } = new();
     public HashSet<Env> Envs { get; } = new();
+    public HeroCamp Camp { get; private set; }
 
 
     public T Spawn<T>(Vector3 position, int templateID) where T : BaseObject
@@ -71,6 +72,10 @@ public class ObjectManager
                 env.SetInfo(templateID);
                 break;
             case EObjectType.None:
+                break;
+            case EObjectType.HeroCamp:
+                Camp = go.GetComponent<HeroCamp
+                >();
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

@@ -15,6 +15,12 @@ MonoBehaviour:
   m_GroupName: Prefabs
   m_GUID: cf4b282cef91d7c4f9fe264b36dc0c04
   m_SerializeEntries:
+  - m_GUID: 0ec9305ef4f91fd4c96e83580c7656b6
+    m_Address: HeroCamp
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - PreLoad
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1f13423cb3b174b4da5307fc2467c6b8
     m_Address: Hero
     m_ReadOnly: 0

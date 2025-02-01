@@ -25,13 +25,6 @@ public class ObjectManager
         {
             case EObjectType.Creature:
             {
-                // Data Check
-                if (templateID != 0 && Managers.Data.CreatureDic.TryGetValue(templateID, out var creatureData) == false)
-                {
-                    Debug.LogError($"ObjectManager Spawn Creature Failed! TryGetValue TemplateID : {templateID}");
-                    return null;
-                }
-
                 var creature = go.GetComponent<Creature>();
                 switch (creature.CreatureType)
                 {
@@ -103,6 +96,11 @@ public class ObjectManager
                         var monster = creature as Monster;
                         Monsters.Remove(monster);
                         break;
+                    case ECreatureType.None:
+                    case ECreatureType.Npc:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
                 break;
             }
@@ -111,6 +109,11 @@ public class ObjectManager
                 var env = obj as Env;
                 Envs.Remove(env);
                 break;
+            case EObjectType.None:
+            case EObjectType.HeroCamp:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
         Managers.Resource.Destroy(obj.gameObject);
     }

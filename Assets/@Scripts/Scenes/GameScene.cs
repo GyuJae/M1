@@ -15,8 +15,11 @@ public class GameScene : BaseScene
 
         for (var i = 0; i < 5; i++)
         {
+
+            var heroTemplateID = HERO_WIZARD_ID + Random.Range(0, 5);
+            // const int heroTemplateID = HERO_KNIGHT_ID;
             var hero = Managers.Object.Spawn<Hero>(
-                new Vector3Int(-10 + Random.Range(-5, 5), -5 + Random.Range(-5, 5), 0), HERO_KNIGHT_ID);
+                new Vector3Int(-10 + Random.Range(-5, 5), -5 + Random.Range(-5, 5), 0), heroTemplateID);
         }
 
         var camp = Managers.Object.Spawn<HeroCamp>(new Vector3Int(-10, -5, 0), 0);
@@ -29,6 +32,8 @@ public class GameScene : BaseScene
 
         {
             Managers.Object.Spawn<Monster>(new Vector3Int(0, 1, 0), MONSTER_BEAR_ID);
+            Managers.Object.Spawn<Monster>(new Vector3Int(0, 1, 0), MONSTER_SLIME_ID);
+            Managers.Object.Spawn<Monster>(new Vector3Int(0, 1, 0), MONSTER_GOBLIN_ARCHER_ID);
         }
 
         {

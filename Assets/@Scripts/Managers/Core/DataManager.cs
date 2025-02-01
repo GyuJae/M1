@@ -10,12 +10,18 @@ public interface ILoader<Key, Value>
 
 public class DataManager
 {
-    public Dictionary<int, CreatureData> CreatureDic { get; private set; } = new();
+    public Dictionary<int, MonsterData> MonsterDic { get; private set; } = new();
+    public Dictionary<int, HeroData> HeroDic { get; private set; } = new();
+    public Dictionary<int, SkillData> SkillDic { get; private set; } = new();
+    public Dictionary<int, ProjectileData> ProjectileDic { get; private set; } = new();
     public Dictionary<int, EnvData> EnvDic { get; private set; } = new();
 
     public void Init()
     {
-        CreatureDic = LoadJson<CreatureDataLoader, int, CreatureData>("CreatureData").MakeDict();
+        MonsterDic = LoadJson<MonsterDataLoader, int, MonsterData>("MonsterData").MakeDict();
+        HeroDic = LoadJson<HeroDataLoader, int, HeroData>("HeroData").MakeDict();
+        SkillDic = LoadJson<SkillDataLoader, int, SkillData>("SkillData").MakeDict();
+        ProjectileDic = LoadJson<ProjectileDataLoader, int, ProjectileData>("ProjectileData").MakeDict();
         EnvDic = LoadJson<EnvDataLoader, int, EnvData>("EnvData").MakeDict();
     }
 

@@ -29,6 +29,19 @@ public class Monster : Creature
         CreatureState = ECreatureState.Idle;
     }
 
+    #region Battle
+
+    public override void OnDead(BaseObject attacker, SkillBase skill)
+    {
+        base.OnDead(attacker, skill);
+
+        // TODO : Drop Item
+
+        Managers.Object.Despawn(this);
+    }
+
+    #endregion
+
     #region AI
 
     Creature _target;
@@ -133,25 +146,6 @@ public class Monster : Creature
     protected override void UpdateDead()
     {
 
-    }
-
-    #endregion
-
-    #region Battle
-
-    public override void OnDamaged(BaseObject attacker)
-    {
-        base.OnDamaged(attacker);
-        // TODO
-    }
-
-    public override void OnDead(BaseObject attacker)
-    {
-        base.OnDead(attacker);
-
-        // TODO : Drop Item
-
-        Managers.Object.Despawn(this);
     }
 
     #endregion

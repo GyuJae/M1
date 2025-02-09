@@ -7,109 +7,119 @@ using Object = UnityEngine.Object;
 
 public class ResourceManager
 {
-	readonly Dictionary<string, Object> resources = new();
-	readonly Dictionary<string, AsyncOperationHandle> handles = new();
+    readonly Dictionary<string, AsyncOperationHandle> handles = new();
+    readonly Dictionary<string, Object> resources = new();
 
-	#region Load Resource
-	public T Load<T>(string key) where T : Object
-	{
-		if (resources.TryGetValue(key, out Object resource))
-			return resource as T;
+    #region Load Resource
 
-		return null;
-	}
+    public T Load<T>(string key) where T : Object
+    {
+        if (resources.TryGetValue(key, out var resource))
+            return resource as T;
 
-	public GameObject Instantiate(string key, Transform parent = null, bool pooling = false)
-	{
-		GameObject prefab = Load<GameObject>(key);
-		if (prefab == null)
-		{
-			Debug.LogError($"Failed to load prefab : {key}");
-			return null;
-		}
-		
-		if (pooling)
-			return Managers.Pool.Pop(prefab);
+        if (typeof(T) == typeof(Sprite) && key.Contains(".sprite") == false)
+        {
+            if (resources.TryGetValue($"{key}.sprite", out resource))
+                return resource as T;
+        }
 
-		GameObject go = Object.Instantiate(prefab, parent);
-		go.name = prefab.name;
+        return null;
+    }
 
-		return go;
-	}
+    public GameObject Instantiate(string key, Transform parent = null, bool pooling = false)
+    {
+        var prefab = Load<GameObject>(key);
+        if (prefab == null)
+        {
+            Debug.LogError($"Failed to load prefab : {key}");
+            return null;
+        }
 
-	public void Destroy(GameObject go)
-	{
-		if (go == null)
-			return;
+        if (pooling)
+            return Managers.Pool.Pop(prefab);
 
-		if (Managers.Pool.Push(go))
-			return;
+        var go = Object.Instantiate(prefab, parent);
+        go.name = prefab.name;
 
-		Object.Destroy(go);
-	}
-	#endregion
+        return go;
+    }
 
-	#region Addressable
-	private void LoadAsync<T>(string key, Action<T> callback = null) where T : UnityEngine.Object
-	{
-		// Cache
-		if (resources.TryGetValue(key, out Object resource))
-		{
-			callback?.Invoke(resource as T);
-			return;
-		}
+    public void Destroy(GameObject go)
+    {
+        if (go == null)
+            return;
 
-		string loadKey = key;
-		if (key.Contains(".sprite"))
-			loadKey = $"{key}[{key.Replace(".sprite", "")}]";
+        if (Managers.Pool.Push(go))
+            return;
 
-		var asyncOperation = Addressables.LoadAssetAsync<T>(loadKey);
-		asyncOperation.Completed += (op) =>
-		{
-			resources.Add(key, op.Result);
-			handles.Add(key, asyncOperation);
-			callback?.Invoke(op.Result);
-		};
-	}
+        Object.Destroy(go);
+    }
 
-	public void LoadAllAsync<T>(string label, Action<string, int, int> callback) where T : Object
-	{
-		var opHandle = Addressables.LoadResourceLocationsAsync(label, typeof(T));
-		opHandle.Completed += (op) =>
-		{
-			int loadCount = 0;
-			int totalCount = op.Result.Count;
+    #endregion
 
-			foreach (var result in op.Result)
-			{
-				if (result.PrimaryKey.Contains(".sprite"))
-				{
-					LoadAsync<Sprite>(result.PrimaryKey, (obj) =>
-					{
-						loadCount++;
-						callback?.Invoke(result.PrimaryKey, loadCount, totalCount);
-					});
-				}
-				else
-				{
-					LoadAsync<T>(result.PrimaryKey, (obj) =>
-					{
-						loadCount++;
-						callback?.Invoke(result.PrimaryKey, loadCount, totalCount);
-					});
-				}
-			}
-		};
-	}
+    #region Addressable
 
-	public void Clear()
-	{
-		resources.Clear();
+    void LoadAsync<T>(string key, Action<T> callback = null) where T : Object
+    {
+        // Cache
+        if (resources.TryGetValue(key, out var resource))
+        {
+            callback?.Invoke(resource as T);
+            return;
+        }
 
-		foreach (var handle in handles)
-			Addressables.Release(handle);
+        var loadKey = key;
+        if (key.Contains(".sprite"))
+            loadKey = $"{key}[{key.Replace(".sprite", "")}]";
 
-		handles.Clear();
-	}
-	#endregion
+        var asyncOperation = Addressables.LoadAssetAsync<T>(loadKey);
+        asyncOperation.Completed += op =>
+        {
+            resources.Add(key, op.Result);
+            handles.Add(key, asyncOperation);
+            callback?.Invoke(op.Result);
+        };
+    }
+
+    public void LoadAllAsync<T>(string label, Action<string, int, int> callback) where T : Object
+    {
+        var opHandle = Addressables.LoadResourceLocationsAsync(label, typeof(T));
+        opHandle.Completed += op =>
+        {
+            var loadCount = 0;
+            var totalCount = op.Result.Count;
+
+            foreach (var result in op.Result)
+            {
+                if (result.PrimaryKey.Contains(".sprite"))
+                {
+                    LoadAsync<Sprite>(result.PrimaryKey, obj =>
+                    {
+                        loadCount++;
+                        callback?.Invoke(result.PrimaryKey, loadCount, totalCount);
+                    });
+                }
+                else
+                {
+                    LoadAsync<T>(result.PrimaryKey, obj =>
+                    {
+                        loadCount++;
+                        callback?.Invoke(result.PrimaryKey, loadCount, totalCount);
+                    });
+                }
+            }
+        };
+    }
+
+    public void Clear()
+    {
+        resources.Clear();
+
+        foreach (var handle in handles)
+            Addressables.Release(handle);
+
+        handles.Clear();
+    }
+
+    #endregion
 }

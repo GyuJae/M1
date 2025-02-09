@@ -144,15 +144,6 @@ public class Hero : Creature
     public override void OnAnimEventHandler(TrackEntry trackEntry, Event e)
     {
         base.OnAnimEventHandler(trackEntry, e);
-
-        // TODO
-        CreatureState = ECreatureState.Move;
-
-        // Skill
-        if (_target.IsValid() == false)
-            return;
-
-        _target.OnDamaged(this);
     }
 
     #region AI

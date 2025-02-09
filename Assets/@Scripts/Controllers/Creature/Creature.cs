@@ -9,6 +9,7 @@ using static Define;
 public class Creature : BaseObject
 {
     protected ECreatureState creatureState = ECreatureState.None;
+    public BaseObject Target { get; protected set; }
     public CreatureData CreatureData { get; private set; }
 
     public ECreatureType CreatureType { get; protected set; } = ECreatureType.None;
@@ -195,9 +196,9 @@ public class Creature : BaseObject
 
     #region Battle
 
-    public override void OnDamaged(BaseObject attacker)
+    public override void OnDamaged(BaseObject attacker, SkillBase skill)
     {
-        base.OnDamaged(attacker);
+        base.OnDamaged(attacker, skill);
 
         if (attacker.IsValid() == false)
             return;
@@ -211,16 +212,14 @@ public class Creature : BaseObject
 
         if (Hp <= 0)
         {
-            OnDead(attacker);
+            OnDead(attacker, skill);
             CreatureState = ECreatureState.Dead;
         }
     }
 
-    public override void OnDead(BaseObject attacker)
+    public override void OnDead(BaseObject attacker, SkillBase skill)
     {
-        base.OnDead(attacker);
-
-
+        base.OnDead(attacker, skill);
     }
 
     #endregion
